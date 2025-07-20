@@ -1,0 +1,20 @@
+{
+  "name": "tebot",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon -r dotenv/config --experimental-json-modules app.js"
+  },
+  "keywords": [],
+  "type": "module",
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "afpp": "^1.7.0",
+    "axios": "^1.10.0",
+    "dotenv": "^16.6.0",
+    "nodemon": "^3.1.10",
+    "telegraf": "^4.16.3"
+  }
+}
