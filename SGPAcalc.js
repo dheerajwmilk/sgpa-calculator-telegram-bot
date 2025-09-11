@@ -15,7 +15,7 @@ export async function sgpaCalc(result, providedSemester) {
     }
 
     const semesters = {
-        1: {
+        "1-2": {
             "Engineering Mathematics-I": 4.0,
             "Engineering Chemistry": 4.0,
             "Human Values": 2.0,
@@ -26,8 +26,6 @@ export async function sgpaCalc(result, providedSemester) {
             "Computer Programming Lab": 1.5,
             "Basic Civil Engineering Lab": 1.0,
             "Computer Aided Engineering Graphics": 1.5,
-        },
-        2: {
             "Engineering Mathematics-II": 4.0,
             "Engineering Physics": 4.0,
             "Communication Skills": 2.0,
@@ -38,13 +36,13 @@ export async function sgpaCalc(result, providedSemester) {
             "Manufacturing Practices Workshop": 1.5,
             "Basic Electrical Engineering Lab": 1.0,
             "Computer Aided Machine Drawing": 1.5,
-            "Sports I": 0.5,
+            "Sports I": 0.5
         },
         3: {
             "Advanced Engineering Mathematics": 3,
             "Managerial Economics & Financial Accounting": 2,
             "Digital Electronics": 3,
-            "Data Structures & Algorithms": 3,
+            "Data Structures and Algorithms": 3,
             "Object Oriented Programming": 3,
             "Software Engineering": 3,
             "Data Structures & Algorithms Lab": 1.5,
@@ -123,10 +121,8 @@ export async function sgpaCalc(result, providedSemester) {
         // Detection rules based on unique subjects (prioritize exact matches)
         if (extractedSubjects.some(s => s.includes('managerial economics') || s.includes('data structures'))) {
             semester = 3;
-        } else if (extractedSubjects.some(s => s.includes('engineering mathematics-i') || s.includes('engineering chemistry'))) {
-            semester = 1;
-        } else if (extractedSubjects.some(s => s.includes('engineering mathematics-ii') || s.includes('engineering physics'))) {
-            semester = 2;
+        } else if (extractedSubjects.some(s => s.includes('engineering mathematics-i') || s.includes('engineering chemistry') || s.includes('engineering mathematics-ii') || s.includes('engineering physics'))) {
+            semester = "1-2";
         } else if (extractedSubjects.some(s => s.includes('discrete mathematics') || s.includes('database management'))) {
             semester = 4;
         } else if (extractedSubjects.some(s => s.includes('compiler design') || s.includes('operating system'))) {
@@ -149,15 +145,18 @@ export async function sgpaCalc(result, providedSemester) {
     const expectedSubjects = Object.keys(semesters[semester]);
     const extractedSubjects = Object.keys(result);
 
-    // Normalize for comparison (case-insensitive, trim & normalize common variations like "and" vs "&")
-    const normalizeSubject = (s) => s.toLowerCase().replace(/ & /g, ' and ').replace(/\s+/g, ' ').trim();
-    const expectedSet = new Set(expectedSubjects.map(normalizeSubject));
-    const extractedSet = new Set(extractedSubjects.map(normalizeSubject));
+    // Skip validation for semesters 1-2
+    if (semester !== "1-2") {
+        // Normalize for comparison (case-insensitive, trim & normalize common variations like "and" vs "&")
+        const normalizeSubject = (s) => s.toLowerCase().replace(/ & /g, ' and ').replace(/\s+/g, ' ').trim();
+        const expectedSet = new Set(expectedSubjects.map(normalizeSubject));
+        const extractedSet = new Set(extractedSubjects.map(normalizeSubject));
 
-    // Check if extracted matches expected (allow for minor variations; require all expected subjects present)
-    const missingSubjects = [...expectedSet].filter(s => ![...extractedSet].some(es => es.includes(s.split(' ').slice(-2).join(' ')) || es === s));
-    if (missingSubjects.length > 0) {
-        return `❌ Mismatch for semester ${semester}. Missing subjects: ${missingSubjects.slice(0, 3).join(', ')}${missingSubjects.length > 3 ? '...' : ''}. Please check PDF.`;
+        // Check if extracted matches expected (allow for minor variations; require all expected subjects present)
+        const missingSubjects = [...expectedSet].filter(s => ![...extractedSet].some(es => es.includes(s.split(' ').slice(-2).join(' ')) || es === s));
+        if (missingSubjects.length > 0) {
+            return `❌ Mismatch for semester ${semester}. Missing subjects: ${missingSubjects.slice(0, 3).join(', ')}${missingSubjects.length > 3 ? '...' : ''}. Please check PDF.`;
+        }
     }
 
     const subjToCredits = semesters[semester];
@@ -180,5 +179,5 @@ export async function sgpaCalc(result, providedSemester) {
     }
 
     const finalCal = (sumOfProduct / sumofCP).toFixed(2);
-    return `✅ Detected/Selected Semester: ${semester}\nYour SGPA is ${finalCal}`;
+    return `Detected/Selected Semester: ${semester}\nYour SGPA is ${finalCal}`;
 }
