@@ -42,7 +42,7 @@ export async function sgpaCalc(result, providedSemester) {
             "Advanced Engineering Mathematics": 3,
             "Managerial Economics & Financial Accounting": 2,
             "Digital Electronics": 3,
-            "Data Structures and Algorithms": 3,
+            "Data Structures & Algorithms": 3,
             "Object Oriented Programming": 3,
             "Software Engineering": 3,
             "Data Structures & Algorithms Lab": 1.5,
