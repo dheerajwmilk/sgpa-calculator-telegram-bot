@@ -25,13 +25,12 @@ bot.command('start', async (ctx) => {
     await ctx.reply(
         'Welcome to the SGPA Calculator Bot! use /sgpa to get started',
     );
-    // console.log(ctx);
 });
+
 bot.command('about', async (ctx) => {
     await ctx.reply(
         "Welcome to the SGPA Calculator Bot!\n\nThis handy tool makes it effortless to compute your RTU BTech SGPA—no more wrestling with clunky online calculators or manually inputting data.\n\nNote: We're still in the development phase, and testing has been limited so far. If you spot any issues or inaccuracies, please DM me at @haaleluah for quick fixes. Your feedback helps us improve!\n\nReady to calculate? Just share your semester details using the /sgpa command. 🚀"
     );
-    // console.log(ctx);
 });
 
 bot.command('sgpa', async (ctx) => {
@@ -46,6 +45,7 @@ bot.on('document', async (ctx) => {
     if (file.mime_type !== 'application/pdf') {
         return ctx.reply('Please upload a PDF file only.');
     }
+
     if (ctx.session.state === 'waiting_pdf') {
         try {
             // Get file link from Telegram
@@ -62,9 +62,23 @@ bot.on('document', async (ctx) => {
             writer.on('finish', async () => {
                 ctx.reply('PDF received successfully!');
                 
-                // Call parsePDFtoJSON with null semester (auto-detect)
-                const result = await parsePDFtoJSON(filePath, null);
-                ctx.reply(result);
+                try {
+                    // Call parsePDFtoJSON with null semester (auto-detect)
+                    const result = await parsePDFtoJSON(filePath, null);
+                    ctx.reply(result);
+                } catch (err) {
+                    console.error(err);
+                    ctx.reply('Error while parsing PDF.');
+                } finally {
+                    // Delete the file after processing
+                    try {
+                        fs.unlinkSync(filePath);
+                        console.log(`Deleted file: ${filePath}`);
+                    } catch (unlinkErr) {
+                        console.error(`Failed to delete file: ${filePath}`, unlinkErr);
+                    }
+                }
+
                 ctx.session.state = null; // Reset state after processing
             });
             
